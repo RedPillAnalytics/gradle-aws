@@ -2,7 +2,6 @@ package com.redpillanalytics.aws.tasks
 
 import com.amazonaws.services.s3.transfer.MultipleFileDownload
 import groovy.util.logging.Slf4j
-import org.gradle.api.PathValidation
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
