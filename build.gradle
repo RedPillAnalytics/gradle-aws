@@ -1,0 +1,155 @@
+plugins {
+   id "com.gradle.plugin-publish" version "0.10.1"
+   id "pl.allegro.tech.build.axion-release" version "1.10.1"
+   id "com.github.breadmoirai.github-release" version "2.2.8"
+   id 'groovy'
+   id 'java-gradle-plugin'
+   id 'org.unbroken-dome.test-sets' version '2.1.1'
+   id "com.github.ben-manes.versions" version "0.21.0"
+   id 'com.adarshr.test-logger' version '1.6.0'
+   id "com.redpillanalytics.gradle-analytics" version "1.2.3"
+}
+
+ext.pluginName = rootProject.name
+
+// send gradle analytics
+analytics {
+   organization = 'Red Pill Analytics'
+   sinks {
+      pubsub
+   }
+}
+
+scmVersion {
+
+   tag {
+      prefix = 'v'
+      versionSeparator = ''
+   }
+   ignoreUncommittedChanges = true
+}
+
+//set Gradle version to SCM Version
+allprojects {
+   project.version = scmVersion.version
+}
+
+githubRelease {
+
+   token = githubToken
+   owner = 'RedPillAnalytics'
+   repo = rootProject.name
+   tagName = "v${version}"
+   releaseAssets = fileTree(dir: buildDir, includes: ["**/*${version}*", "**/*${version}*.jar"]).toList()
+}
+
+dependencies {
+
+   compile gradleApi()
+   compile localGroovy()
+   compile 'org.slf4j:slf4j-simple:+'
+
+   testCompile 'org.spockframework:spock-core:1.2-groovy-2.5'
+
+   // AWS
+   compile 'com.amazonaws:aws-java-sdk-s3:+'
+
+   //other plugins
+   compile "gradle.plugin.com.redpillanalytics:plugin-template:0.1.5"
+}
+
+// Default artifact naming.
+group = 'com.redpillanalytics'
+
+repositories {
+   jcenter()
+   maven {
+      url "https://plugins.gradle.org/m2/"
+   }
+}
+
+gradlePlugin {
+   plugins {
+      pluginAws {
+         id = "com.redpillanalytics.${pluginName}"
+         implementationClass = 'com.redpillanalytics.aws.AwsPlugin'
+      }
+   }
+}
+
+pluginBundle {
+
+   description = "A plugin for working with AWS. Initial functionality is for working with S3."
+   website = "https://github.com/RedPillAnalytics/${rootProject.name}/"
+   vcsUrl = "https://github.com/RedPillAnalytics/${rootProject.name}/"
+
+   plugins {
+      pluginAws {
+         id = "com.redpillanalytics.${pluginName}"
+         displayName = pluginName
+         tags = ['aws', 's3']
+         version = project.version
+      }
+   }
+
+   mavenCoordinates {
+      groupId = group
+      artifactId = pluginName
+      version = project.version
+   }
+}
+
+// Options for all tests
+tasks.withType(Test) {
+   testLogging.showStandardStreams true
+   systemProperty 'projectDir', temporaryDir
+}
+
+ext.bucket = 's3://documentation.redpillanalytics.com'
+ext.resourceBucket = 's3://rpa-build-resources'
+
+task publishVersionDocs {
+
+   description = 'Upload version Groovydocs to s3.'
+   group = 'documentation'
+
+   doLast {
+      exec {
+         executable 'aws'
+         args 's3', 'sync', groovydoc.destinationDir.getPath(), "${bucket}/${pluginName}/${version}/"
+      }
+   }
+   dependsOn groovydoc
+}
+
+task publishLatestDocs {
+
+   description = 'Upload latest Groovydocs to s3.'
+   group = 'documentation'
+
+   doLast {
+      exec {
+         executable 'aws'
+         args 's3', 'sync', groovydoc.destinationDir.getPath(), "${bucket}/${pluginName}/latest/"
+      }
+   }
+   dependsOn groovydoc
+}
+
+task copyBuildResources {
+   description 'Copy build resource files from S3.'
+   group 'build'
+   doLast {
+      exec {
+         executable 'aws'
+         args 's3', 'cp', "${resourceBucket}/gradle-analytics-build-user.json", "."
+      }
+      exec {
+         executable 'aws'
+         args 's3', 'cp', "${resourceBucket}/gradle.properties", "."
+      }
+   }
+}
+
+
+
