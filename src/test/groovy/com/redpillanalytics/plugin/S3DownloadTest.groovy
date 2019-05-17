@@ -86,4 +86,22 @@ class S3DownloadTest extends Specification {
       expect:
       result.task(":${taskName}").outcome.name() != 'FAILED'
    }
+
+   def "Execute :s3DownloadSync task with defaults"() {
+      given:
+      taskName = 's3DownloadSync'
+      result = executeSingleTask(taskName, ['-Si', '--bucket-name', bucket, '--key-name', 'custom-build'])
+
+      expect:
+      result.task(":${taskName}").outcome.name() != 'FAILED'
+   }
+
+   def "Execute :s3DownloadSync task with custom file path"() {
+      given:
+      taskName = 's3DownloadSync'
+      result = executeSingleTask(taskName, ['-Si', '--bucket-name', bucket, '--key-name', 'custom-build', '--file-path', 'custom-build-sync-dir'])
+
+      expect:
+      result.task(":${taskName}").outcome.name() != 'FAILED'
+   }
 }
