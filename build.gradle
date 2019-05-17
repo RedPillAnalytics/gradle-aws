@@ -17,6 +17,9 @@ analytics {
    organization = 'Red Pill Analytics'
    sinks {
       pubsub
+      s3 {
+         prefix = 'rpa-gradle-analytics' 
+      }
    }
 }
 
