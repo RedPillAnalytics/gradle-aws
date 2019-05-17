@@ -53,10 +53,16 @@ class S3Task extends DefaultTask {
       return file
    }
 
+   @Internal
+   getBucketName(){
+      log.info "Bucket: $bucketName"
+      return bucketName
+   }
+
    @Input
    getKey() {
       String key = keyName ?: file.name
-      log.debug "Key: $key"
+      log.info "Key: $key"
       return key
    }
 }
