@@ -13,6 +13,7 @@ class S3DownloadTask extends S3Task {
    S3DownloadTask() {
       description = 'Download a file from S3.'
       group = 'AWS'
+      outputs.upToDateWhen { false }
    }
 
    @OutputFile
