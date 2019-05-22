@@ -13,6 +13,7 @@ class S3DownloadSyncTask extends S3Task {
    S3DownloadSyncTask() {
       description = 'Synchronize a directory to an S3 bucket.'
       group = 'AWS'
+      outputs.upToDateWhen { false }
    }
 
    /**

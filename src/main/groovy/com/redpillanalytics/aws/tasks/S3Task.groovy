@@ -2,6 +2,7 @@ package com.redpillanalytics.aws.tasks
 
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
+import com.amazonaws.services.s3.model.ListObjectsRequest
 import com.amazonaws.services.s3.transfer.TransferManager
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder
 import groovy.util.logging.Slf4j
@@ -9,6 +10,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.options.Option
 
 @Slf4j
@@ -54,7 +56,7 @@ class S3Task extends DefaultTask {
    }
 
    @Internal
-   getBucketName(){
+   getBucketName() {
       log.info "Bucket: $bucketName"
       return bucketName
    }
@@ -64,5 +66,15 @@ class S3Task extends DefaultTask {
       String key = keyName ?: file.name
       log.info "Key: $key"
       return key
+   }
+
+   @Internal
+   def writeObjectList(String bucket) {
+      ListObjectsRequest request = new ListObjectsRequest()
+              .withBucketName(bucket)
+
+      log.warn "Bucket list: ${s3.listObjects(bucket)}"
+
+      bucketList.write(s3.listObjects(bucket).toString())
    }
 }
