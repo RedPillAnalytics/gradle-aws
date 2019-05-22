@@ -145,11 +145,11 @@ task copyBuildResources {
    doLast {
       exec {
          executable 'aws'
-         args 's3', 'cp', "${resourceBucket}/gradle-analytics-build-user.json", "."
+         args 's3', 'cp', "${resourceBucket}/gradle-analytics-build-user.json", "${gradle.getGradleUserHomeDir().toString()}"
       }
       exec {
          executable 'aws'
-         args 's3', 'cp', "${resourceBucket}/gradle.properties", "."
+         args 's3', 'cp', "${resourceBucket}/gradle.properties", "${gradle.getGradleUserHomeDir().toString()}"
       }
    }
 }
