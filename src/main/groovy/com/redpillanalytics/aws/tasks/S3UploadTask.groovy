@@ -21,6 +21,6 @@ class S3UploadTask extends S3Task {
 
    @TaskAction
    def s3Upload() {
-      s3.putObject(bucketName, key, inputFile)
+      defaultClient.putObject(bucketName, key, inputFile)
    }
 }
