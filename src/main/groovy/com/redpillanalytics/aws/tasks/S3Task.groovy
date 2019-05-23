@@ -64,12 +64,8 @@ class S3Task extends DefaultTask {
    }
 
    @Internal
-   def writeObjectList(String bucket) {
-      ListObjectsRequest request = new ListObjectsRequest()
-              .withBucketName(bucket)
-
-      log.warn "Bucket list: ${defaultClient.listObjects(bucket)}"
-
+   def writeObjectList(String bucket, File bucketList) {
+      log.info "Bucket list: ${defaultClient.listObjects(bucket)}"
       bucketList.write(defaultClient.listObjects(bucket).toString())
    }
 }

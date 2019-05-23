@@ -19,6 +19,6 @@ class WriteBucketListTask extends S3Task {
 
    @TaskAction
    def s3Download() {
-      writeObjectList(bucketName)
+      writeObjectList(bucketName, bucketList)
    }
 }
