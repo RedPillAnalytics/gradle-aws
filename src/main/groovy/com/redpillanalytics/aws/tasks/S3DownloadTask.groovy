@@ -23,7 +23,7 @@ class S3DownloadTask extends S3Task {
 
    @Internal
    S3Object getObject() {
-      return s3.getObject(bucketName, keyName)
+      return defaultClient.getObject(bucketName, keyName)
    }
 
    @TaskAction

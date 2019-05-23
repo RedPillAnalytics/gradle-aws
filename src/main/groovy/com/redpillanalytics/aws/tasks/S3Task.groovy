@@ -10,14 +10,15 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
-import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.options.Option
 
 @Slf4j
 class S3Task extends DefaultTask {
 
    @Internal
-   AmazonS3 s3 = AmazonS3ClientBuilder.defaultClient()
+   AmazonS3 getDefaultClient() {
+      return AmazonS3ClientBuilder.defaultClient()
+   }
 
    @Internal
    TransferManager tm = TransferManagerBuilder.standard().build()
@@ -55,12 +56,6 @@ class S3Task extends DefaultTask {
       return file
    }
 
-   @Internal
-   getBucketName() {
-      log.info "Bucket: $bucketName"
-      return bucketName
-   }
-
    @Input
    getKey() {
       String key = keyName ?: file.name
@@ -69,12 +64,8 @@ class S3Task extends DefaultTask {
    }
 
    @Internal
-   def writeObjectList(String bucket) {
-      ListObjectsRequest request = new ListObjectsRequest()
-              .withBucketName(bucket)
-
-      log.warn "Bucket list: ${s3.listObjects(bucket)}"
-
-      bucketList.write(s3.listObjects(bucket).toString())
+   def writeObjectList(String bucket, File bucketList) {
+      log.info "Bucket list: ${defaultClient.listObjects(bucket)}"
+      bucketList.write(defaultClient.listObjects(bucket).toString())
    }
 }
