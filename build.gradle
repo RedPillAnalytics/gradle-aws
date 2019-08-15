@@ -1,12 +1,12 @@
 plugins {
    id "com.gradle.plugin-publish" version "0.10.1"
-   id "pl.allegro.tech.build.axion-release" version "1.10.1"
-   id "com.github.breadmoirai.github-release" version "2.2.8"
+   id "pl.allegro.tech.build.axion-release" version "1.10.2"
+   id "com.github.breadmoirai.github-release" version "2.2.9"
    id 'groovy'
    id 'java-gradle-plugin'
    id 'org.unbroken-dome.test-sets' version '2.1.1'
-   id "com.github.ben-manes.versions" version "0.21.0"
-   id 'com.adarshr.test-logger' version '1.6.0'
+   id "com.github.ben-manes.versions" version "0.22.0"
+   id 'com.adarshr.test-logger' version '1.7.0'
    id "com.redpillanalytics.gradle-analytics" version "1.2.3"
 }
 
@@ -58,7 +58,7 @@ dependencies {
    compile 'com.amazonaws:aws-java-sdk-s3:+'
 
    //other plugins
-   compile "gradle.plugin.com.redpillanalytics:plugin-template:0.1.5"
+   compile "gradle.plugin.com.redpillanalytics:plugin-template:0.1.6"
 }
 
 // Default artifact naming.
