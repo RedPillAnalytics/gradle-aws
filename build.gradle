@@ -1,13 +1,13 @@
 plugins {
    id "com.gradle.plugin-publish" version "0.10.1"
    id "pl.allegro.tech.build.axion-release" version "1.10.2"
-   id "com.github.breadmoirai.github-release" version "2.2.9"
    id 'groovy'
    id 'java-gradle-plugin'
-   id 'org.unbroken-dome.test-sets' version '2.1.1'
-   id "com.github.ben-manes.versions" version "0.22.0"
-   id 'com.adarshr.test-logger' version '1.7.0'
    id "com.redpillanalytics.gradle-analytics" version "1.2.3"
+   id "com.github.breadmoirai.github-release" version "2.2.10"
+   id 'org.unbroken-dome.test-sets' version '2.2.1'
+   id "com.github.ben-manes.versions" version "0.27.0"
+   id 'com.adarshr.test-logger' version '2.0.0'
 }
 
 ext.pluginName = rootProject.name
@@ -58,7 +58,7 @@ dependencies {
    compile 'com.amazonaws:aws-java-sdk-s3:+'
 
    //other plugins
-   compile "gradle.plugin.com.redpillanalytics:plugin-template:0.1.6"
+   compile "gradle.plugin.com.redpillanalytics:gradle-properties:0.1.2"
 }
 
 // Default artifact naming.
@@ -105,7 +105,7 @@ pluginBundle {
 // Options for all tests
 tasks.withType(Test) {
    testLogging.showStandardStreams true
-   systemProperty 'projectDir', temporaryDir
+   systemProperty 'projectBase', temporaryDir
 }
 
 ext.bucket = 's3://documentation.redpillanalytics.com'
