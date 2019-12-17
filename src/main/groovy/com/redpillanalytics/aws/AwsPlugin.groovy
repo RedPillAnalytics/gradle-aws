@@ -13,7 +13,7 @@ class AwsPlugin implements Plugin<Project> {
 
    void apply(Project project) {
 
-      project.apply plugin: 'com.redpillanalytics.plugin-template'
+      project.apply plugin: 'com.redpillanalytics.gradle-properties'
 
       project.configure(project) {
          extensions.create('aws', AwsPluginExtension)
