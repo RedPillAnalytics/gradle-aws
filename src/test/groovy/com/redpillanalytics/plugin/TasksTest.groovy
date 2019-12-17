@@ -1,57 +1,84 @@
 package com.redpillanalytics.plugin
 
 import groovy.util.logging.Slf4j
+import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
-import org.junit.ClassRule
-import org.junit.rules.TemporaryFolder
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Title
 import spock.lang.Unroll
 
 @Slf4j
-@Title("Execute :properties task")
+@Title("Execute :tasks task")
 class TasksTest extends Specification {
-
-   @ClassRule
    @Shared
-   TemporaryFolder testProjectDir = new TemporaryFolder()
+   File projectDir
 
    @Shared
-   File buildFile
-   @Shared
-   def result
+   String projectName = 'tasks-test'
 
-   // run the Gradle build
-   // return regular output
+   @Shared
+   FileTreeBuilder projectTree
+
+   @Shared
+   BuildResult result
+
    def setupSpec() {
 
-      buildFile = testProjectDir.newFile('build.gradle')
-      buildFile << """
-            plugins {
-                id 'com.redpillanalytics.gradle-aws'
-            }
-        """
+      projectTree = new FileTreeBuilder(new File(System.getProperty("projectBase")))
+      projectDir = projectTree.dir(projectName)
+      projectDir.deleteDir()
 
-      result = GradleRunner.create()
-              .withProjectDir(testProjectDir.root)
-              .withArguments('tasks')
-              .withPluginClasspath()
-              .build()
-
-      log.warn result.output
+      projectTree.dir(projectName) {
+         file('build.gradle', """
+            |plugins {
+            |   id 'com.redpillanalytics.gradle-aws'
+            |}
+            |
+            |""".stripMargin())
+         file('settings.gradle', """rootProject.name = '$projectName'""")
+      }
    }
 
+   //helper task
+   def executeSingleTask(String taskName, List otherArgs = []) {
+
+      otherArgs.add(0, taskName)
+
+      log.warn "runner arguments: ${otherArgs.toString()}"
+
+      // execute the Gradle test build
+      result = GradleRunner.create()
+              .withProjectDir(projectDir)
+              .withArguments(otherArgs)
+              .withPluginClasspath()
+              .forwardOutput()
+              .build()
+   }
 
    @Unroll
    def ":tasks contains #task"() {
 
-      given: "executing Gradle :properties"
+      given:
+      executeSingleTask('tasks', ['-S'])
 
       expect:
       result.output.contains("$task")
 
       where:
-      task << ['s3Upload','s3Download']
+      task << ['s3Upload', 's3Download']
+   }
+
+   @Unroll
+   def "task help --task s3Upload contains #parameter"() {
+
+      given:
+      executeSingleTask('help', ['--task', 's3Upload', '-S'])
+
+      expect:
+      result.output.contains("--${parameter}")
+
+      where:
+      parameter << ['bucket-name','file-path','key-name']
    }
 }
