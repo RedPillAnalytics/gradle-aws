@@ -38,7 +38,7 @@ class S3UploadTest extends Specification {
             |   id "com.redpillanalytics.gradle-analytics" version "1.2.3"
             |}
             |aws {
-            | configs {
+            | s3 {
             |   test {
             |     bucket = '${bucket}'
             |     key = 'build'

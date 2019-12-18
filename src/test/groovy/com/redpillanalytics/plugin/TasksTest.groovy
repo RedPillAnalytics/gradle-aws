@@ -35,7 +35,7 @@ class TasksTest extends Specification {
             |   id 'com.redpillanalytics.gradle-aws'
             |}
             |aws {
-            | configs {
+            | s3 {
             |   test {
             |     bucket = 'rpa-s3-test'
             |     key = 'build'

@@ -1,6 +1,6 @@
 package com.redpillanalytics.aws
 
-import com.redpillanalytics.aws.containers.TaskGroupContainer
+import com.redpillanalytics.aws.containers.S3Container
 import com.redpillanalytics.aws.tasks.S3DownloadSyncTask
 import com.redpillanalytics.aws.tasks.S3DownloadTask
 import com.redpillanalytics.aws.tasks.S3UploadSyncTask
@@ -20,15 +20,15 @@ class AwsPlugin implements Plugin<Project> {
 
       project.configure(project) {
          extensions.create(EXTENSION, AwsPluginExtension)
-         project."$EXTENSION".extensions.configs = project.container(TaskGroupContainer)
-         project.extensions."$EXTENSION".configs.add(new TaskGroupContainer('default'))
+         project."$EXTENSION".extensions.s3 = project.container(S3Container)
+         project.extensions."$EXTENSION".s3.add(new S3Container('default'))
       }
 
       project.afterEvaluate {
 
          project.extensions.pluginProps.setParameters(project, EXTENSION)
 
-         project."$EXTENSION".configs.all { tg ->
+         project."$EXTENSION".s3.all { tg ->
 
             if (tg.isDefaultTask()) {
                project.task('s3Download', type: S3DownloadTask) {}

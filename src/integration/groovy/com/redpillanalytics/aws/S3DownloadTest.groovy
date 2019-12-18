@@ -37,7 +37,7 @@ class S3DownloadTest extends Specification {
             |   id 'com.redpillanalytics.gradle-aws'
             |}
             |aws {
-            | configs {
+            | s3 {
             |   test {
             |     bucket = '${bucket}'
             |     key = 'custom-build'

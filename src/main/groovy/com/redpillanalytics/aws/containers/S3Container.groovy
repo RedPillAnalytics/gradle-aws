@@ -3,12 +3,12 @@ package com.redpillanalytics.aws.containers
 import groovy.util.logging.Slf4j
 
 @Slf4j
-class TaskGroupContainer {
+class S3Container {
 
    // Build Group defaults
    private static final String DEFAULT_GROUP = 'default'
 
-   TaskGroupContainer(String name) {
+   S3Container(String name) {
       this.name = name
    }
 
