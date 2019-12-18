@@ -1,5 +1,6 @@
 package com.redpillanalytics.aws.tasks
 
+import com.amazonaws.regions.Regions
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import com.amazonaws.services.s3.transfer.TransferManager
@@ -18,8 +19,7 @@ class S3Task extends DefaultTask {
    AmazonS3 getDefaultClient() {
       return AmazonS3ClientBuilder
               .standard()
-              .withRegion(project.aws.region)
-              .withForceGlobalBucketAccessEnabled(true)
+              .withRegion(Regions.fromName(project.aws.region))
               .build()
    }
 
