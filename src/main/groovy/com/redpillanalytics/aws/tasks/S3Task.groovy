@@ -17,7 +17,7 @@ class S3Task extends DefaultTask {
 
    @Internal
    AmazonS3 getDefaultClient() {
-      return AmazonS3ClientBuilder.standard().withRegion(Regions.DEFAULT_REGION).build()
+      return AmazonS3ClientBuilder.defaultClient()
    }
 
    @Internal
