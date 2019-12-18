@@ -50,7 +50,7 @@ class S3Task extends DefaultTask {
 
    @Internal
    getFile() {
-      File file = filePath ? project.file(filePath) : project.file(keyName)
+      File file = project.file(filePath ?: keyName)
       log.debug "File: $file"
       return file
    }
@@ -58,7 +58,7 @@ class S3Task extends DefaultTask {
    @Input
    getKey() {
       String key = keyName ?: file.name
-      log.info "Key: $key"
+      log.debug "Key: $key"
       return key
    }
 

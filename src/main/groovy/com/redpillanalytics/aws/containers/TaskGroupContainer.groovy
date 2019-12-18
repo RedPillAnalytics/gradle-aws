@@ -8,6 +8,10 @@ class TaskGroupContainer {
    // Build Group defaults
    private static final String DEFAULT_GROUP = 'default'
 
+   TaskGroupContainer(String name) {
+      this.name = name
+   }
+
    /**
     * The name of the container entity.
     */
@@ -19,9 +23,14 @@ class TaskGroupContainer {
    String bucket
 
    /**
-    * The name of key to generate tasks for.
+    * The full name of the key in the bucket. Must be a directory and not a file.
     */
    String key
+
+   /**
+    * The full name of the file path locally. Must be a directory and not a file.
+    */
+   String path
 
    /**
     * Capture the debug status from the Gradle logging framework. Not currently used.
@@ -45,9 +54,9 @@ class TaskGroupContainer {
    /**
     * This plugin has a default set of tasks that are configured with a single task group called 'default'. This method is used during configuration when special handling is needed for those tasks.
     */
-   def isDefaultTask(String buildName) {
+   def isDefaultTask() {
 
-      return (buildName == DEFAULT_GROUP) ? true : false
+      return (name == DEFAULT_GROUP) ? true : false
 
    }
 
@@ -57,13 +66,11 @@ class TaskGroupContainer {
    def getTaskName(String baseTaskName) {
 
       // return either the baseTaskName or prepend with a name
-      String taskName = isDefaultTask(getName()) ? baseTaskName : getName() + baseTaskName.capitalize()
+      String taskName = isDefaultTask() ? baseTaskName : getName() + baseTaskName.capitalize()
 
       logTaskName(taskName)
 
       return taskName
-
-
    }
 
 }

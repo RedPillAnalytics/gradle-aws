@@ -1,6 +1,7 @@
 def options = '-S'
 def properties = "-Panalytics.buildTag=${env.BUILD_TAG}"
 def gradle = "./gradlew ${options} ${properties}"
+def bucket = 's3://documentation.redpillanalytics.com'
 
 pipeline {
   agent {
@@ -44,9 +45,6 @@ pipeline {
          when { branch "master" }
          steps {
             sh "$gradle publish -Pgradle.publish.key=${env.GRADLE_KEY} -Pgradle.publish.secret=${env.GRADLE_SECRET}"
-            container('aws') {
-               sh "$gradle publishDocs"
-            }
          }
          post {
             always {

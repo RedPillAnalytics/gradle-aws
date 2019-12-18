@@ -34,10 +34,20 @@ class TasksTest extends Specification {
             |plugins {
             |   id 'com.redpillanalytics.gradle-aws'
             |}
+            |aws {
+            | configs {
+            |   test {
+            |     bucket = 'rpa-s3-test'
+            |     key = 'build'
+            |   }
+            |  }
+            |}
             |
             |""".stripMargin())
          file('settings.gradle', """rootProject.name = '$projectName'""")
       }
+
+      executeSingleTask('tasks', ['-S'])
    }
 
    //helper task
@@ -60,25 +70,12 @@ class TasksTest extends Specification {
    def ":tasks contains #task"() {
 
       given:
-      executeSingleTask('tasks', ['-S'])
 
       expect:
       result.output.contains("$task")
 
       where:
-      task << ['s3Upload', 's3Download']
+      task << ['s3Upload', 's3Download','s3DownloadSync','s3UploadSync','testS3DownloadSync','testS3UploadSync']
    }
 
-   @Unroll
-   def "task help --task s3Upload contains #parameter"() {
-
-      given:
-      executeSingleTask('help', ['--task', 's3Upload', '-S'])
-
-      expect:
-      result.output.contains("--${parameter}")
-
-      where:
-      parameter << ['bucket-name','file-path','key-name']
-   }
 }

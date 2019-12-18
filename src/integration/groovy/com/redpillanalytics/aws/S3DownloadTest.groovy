@@ -1,6 +1,7 @@
-package com.redpillanalytics.plugin
+package com.redpillanalytics.aws
 
 import groovy.util.logging.Slf4j
+import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import spock.lang.Shared
 import spock.lang.Specification
@@ -13,51 +14,56 @@ import spock.lang.Title
 class S3DownloadTest extends Specification {
 
    @Shared
-   File projectDir, buildDir, buildFile, settingsFile
+   File projectDir
 
    @Shared
-   String taskName, bucket = 'rpa-s3-test'
+   String projectName = 's3-download', bucket = 'rpa-s3-test', taskName
 
    @Shared
-   def result
+   FileTreeBuilder projectTree
 
    @Shared
-   AntBuilder ant = new AntBuilder()
+   BuildResult result
 
-   def setup() {
+   def setupSpec() {
 
-      projectDir = new File("${System.getProperty("projectDir")}/download-test")
-      buildDir = new File(projectDir, 'build')
+      projectTree = new FileTreeBuilder(new File(System.getProperty("projectBase")))
+      projectDir = projectTree.dir(projectName)
+      projectDir.deleteDir()
 
-      ant.mkdir(dir: projectDir)
-
-      settingsFile = new File(projectDir, 'settings.gradle').write("""rootProject.name = 'download-test'""")
-
-      buildFile = new File(projectDir, 'build.gradle').write("""
+      projectTree.dir(projectName) {
+         file('build.gradle', """
             |plugins {
-            |    id 'com.redpillanalytics.gradle-aws'
+            |   id 'com.redpillanalytics.gradle-aws'
             |}
-        |""".stripMargin())
+            |aws {
+            | configs {
+            |   test {
+            |     bucket = '${bucket}'
+            |     key = 'custom-build'
+            |   }
+            |  }
+            |}
+            |
+            |""".stripMargin())
+         file('settings.gradle', """rootProject.name = '$projectName'""")
+      }
    }
 
    // helper method
-   def executeSingleTask(String taskName, List otherArgs, Boolean logOutput = true) {
+   def executeSingleTask(String taskName, List otherArgs = []) {
 
-      def args = [taskName] + otherArgs
+      otherArgs.add(0, taskName)
 
-      log.warn "runner arguments: ${args.toString()}"
+      log.warn "runner arguments: ${otherArgs.toString()}"
 
       // execute the Gradle test build
       result = GradleRunner.create()
               .withProjectDir(projectDir)
-              .withArguments(args)
+              .withArguments(otherArgs)
               .withPluginClasspath()
+              .forwardOutput()
               .build()
-
-      // log the results
-      if (logOutput) log.warn result.getOutput()
-
-      return result
    }
 
    def "Execute :s3Download task with defaults"() {
@@ -100,6 +106,15 @@ class S3DownloadTest extends Specification {
       given:
       taskName = 's3DownloadSync'
       result = executeSingleTask(taskName, ['-Si', '--bucket-name', bucket, '--key-name', 'custom-build', '--file-path', 'custom-build-sync-dir'])
+
+      expect:
+      result.task(":${taskName}").outcome.name() != 'FAILED'
+   }
+
+   def "Execute :testS3DownloadSync task with defaults"() {
+      given:
+      taskName = 'testS3DownloadSync'
+      result = executeSingleTask(taskName, ['-Si'])
 
       expect:
       result.task(":${taskName}").outcome.name() != 'FAILED'

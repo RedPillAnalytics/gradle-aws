@@ -20,21 +20,31 @@ class AwsPlugin implements Plugin<Project> {
 
       project.configure(project) {
          extensions.create(EXTENSION, AwsPluginExtension)
-         project."$EXTENSION".extensions.taskGroups = project.container(TaskGroupContainer)
-         project.extensions."$EXTENSION".taskGroups.add(new TaskGroupContainer(name: 'default'))
+         project."$EXTENSION".extensions.configs = project.container(TaskGroupContainer)
+         project.extensions."$EXTENSION".configs.add(new TaskGroupContainer('default'))
       }
 
       project.afterEvaluate {
 
          project.extensions.pluginProps.setParameters(project, EXTENSION)
 
-         project."$EXTENSION".taskGroups.all { tg ->
-            project.task(tg.getTaskName('s3Download'), type: S3DownloadTask) {}
-            project.task(tg.getTaskName('s3Upload'), type: S3UploadTask) {}
+         project."$EXTENSION".configs.all { tg ->
+
+            if (tg.isDefaultTask()) {
+               project.task('s3Download', type: S3DownloadTask) {}
+               project.task('s3Upload', type: S3UploadTask) {}
+            }
+
             project.task(tg.getTaskName('s3UploadSync'), type: S3UploadSyncTask) {
                bucketName tg.bucket
+               keyName tg.key
+               filePath tg.path
             }
-            project.task(tg.getTaskName('s3DownloadSync'), type: S3DownloadSyncTask) {}
+            project.task(tg.getTaskName('s3DownloadSync'), type: S3DownloadSyncTask) {
+               bucketName tg.bucket
+               keyName tg.key
+               filePath tg.path
+            }
          }
       }
       // end of afterEvaluate

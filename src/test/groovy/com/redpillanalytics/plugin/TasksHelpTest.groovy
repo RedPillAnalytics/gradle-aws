@@ -15,7 +15,7 @@ class TasksHelpTest extends Specification {
    File projectDir
 
    @Shared
-   String projectName = 'tasks-test'
+   String projectName = 'tasks-help-test'
 
    @Shared
    FileTreeBuilder projectTree
@@ -57,19 +57,6 @@ class TasksHelpTest extends Specification {
    }
 
    @Unroll
-   def ":tasks contains #task"() {
-
-      given:
-      executeSingleTask('tasks', ['-S'])
-
-      expect:
-      result.output.contains("$task")
-
-      where:
-      task << ['s3Upload', 's3Download']
-   }
-
-   @Unroll
    def "task help --task s3Upload contains #parameter"() {
 
       given:
@@ -80,31 +67,5 @@ class TasksHelpTest extends Specification {
 
       where:
       parameter << ['bucket-name','file-path','key-name']
-   }
-
-   @Unroll
-   def "region property is applied"() {
-
-      given:
-      executeSingleTask('tasks', ['-Paws.region=us-west-1','-S'])
-
-      expect:
-      result.output.contains("--${parameter}")
-
-      where:
-      parameter << ['bucket-name','file-path','key-name']
-   }
-
-   @Unroll
-   def "properties contains #property"() {
-
-      given:
-      executeSingleTask('properties', ['-Paws.region=us-west-1','-S'])
-
-      expect:
-      result.output.contains("$property")
-
-      where:
-      property << ['aws.region','aws']
    }
 }
