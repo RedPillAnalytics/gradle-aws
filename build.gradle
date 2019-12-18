@@ -1,13 +1,14 @@
 plugins {
    id "com.gradle.plugin-publish" version "0.10.1"
    id "pl.allegro.tech.build.axion-release" version "1.10.2"
-   id "com.github.breadmoirai.github-release" version "2.2.9"
    id 'groovy'
    id 'java-gradle-plugin'
-   id 'org.unbroken-dome.test-sets' version '2.1.1'
-   id "com.github.ben-manes.versions" version "0.22.0"
-   id 'com.adarshr.test-logger' version '1.7.0'
+   id "com.github.breadmoirai.github-release" version "2.2.10"
+   id 'org.unbroken-dome.test-sets' version '2.2.1'
+   id "com.github.ben-manes.versions" version "0.27.0"
+   id 'com.adarshr.test-logger' version '2.0.0'
    id "com.redpillanalytics.gradle-analytics" version "1.2.3"
+   id "com.redpillanalytics.gradle-aws" version "0.1.5"
 }
 
 ext.pluginName = rootProject.name
@@ -37,6 +38,18 @@ allprojects {
    project.version = scmVersion.version
 }
 
+task cleanJunit(type: Delete) {
+   delete getTestResultsDir()
+}
+
+task cleanLibs(type: Delete) {
+   delete getLibsDir()
+}
+
+testSets{
+   integration
+}
+
 githubRelease {
 
    token = githubToken
@@ -58,7 +71,7 @@ dependencies {
    compile 'com.amazonaws:aws-java-sdk-s3:+'
 
    //other plugins
-   compile "gradle.plugin.com.redpillanalytics:plugin-template:0.1.6"
+   compile "gradle.plugin.com.redpillanalytics:gradle-properties:0.1.2"
 }
 
 // Default artifact naming.
@@ -94,19 +107,22 @@ pluginBundle {
          version = project.version
       }
    }
-
-   mavenCoordinates {
-      groupId = group
-      artifactId = pluginName
-      version = project.version
-   }
 }
 
-// Options for all tests
+task runAllTests {
+   description 'Run all defined tests.'
+   group 'verification'
+}
+
 tasks.withType(Test) {
+   tasks.runAllTests.dependsOn it
+   failFast true
+   ignoreFailures true
    testLogging.showStandardStreams true
-   systemProperty 'projectDir', temporaryDir
+   systemProperty 'projectBase', temporaryDir
 }
+
+tasks.githubRelease.mustRunAfter tasks.publishPlugins
 
 ext.bucket = 's3://documentation.redpillanalytics.com'
 ext.resourceBucket = 's3://rpa-build-resources'
@@ -139,19 +155,10 @@ task publishLatestDocs {
    dependsOn groovydoc
 }
 
-task copyBuildResources {
-   description 'Copy build resource files from S3.'
-   group 'build'
-   doLast {
-      exec {
-         executable 'aws'
-         args 's3', 'cp', "${resourceBucket}/gradle-analytics-build-user.json", "${gradle.getGradleUserHomeDir().toString()}"
-      }
-      exec {
-         executable 'aws'
-         args 's3', 'cp', "${resourceBucket}/gradle.properties", "${gradle.getGradleUserHomeDir().toString()}"
-      }
-   }
+task publish {
+   description 'Custom publish task.'
+   group 'publishing'
+   dependsOn tasks.publishPlugins, tasks.githubRelease
 }
 
 

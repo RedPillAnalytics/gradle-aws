@@ -1,5 +1,6 @@
 package com.redpillanalytics.aws.tasks
 
+import com.amazonaws.regions.Regions
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import com.amazonaws.services.s3.transfer.TransferManager
@@ -50,7 +51,7 @@ class S3Task extends DefaultTask {
 
    @Internal
    getFile() {
-      File file = filePath ? project.file(filePath) : project.file(keyName)
+      File file = project.file(filePath ?: keyName)
       log.debug "File: $file"
       return file
    }
@@ -58,7 +59,7 @@ class S3Task extends DefaultTask {
    @Input
    getKey() {
       String key = keyName ?: file.name
-      log.info "Key: $key"
+      log.debug "Key: $key"
       return key
    }
 
@@ -66,5 +67,9 @@ class S3Task extends DefaultTask {
    def writeObjectList(String bucket, File bucketList) {
       log.info "Bucket list: ${defaultClient.listObjects(bucket)}"
       bucketList.write(defaultClient.listObjects(bucket).toString())
+   }
+
+   def logRegion() {
+      log.warn "Region: ${project.extensions.aws.region}"
    }
 }

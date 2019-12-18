@@ -10,12 +10,12 @@ import spock.lang.Unroll
 
 @Slf4j
 @Title("Execute :tasks task")
-class PropertiesTest extends Specification {
+class TasksHelpTest extends Specification {
    @Shared
    File projectDir
 
    @Shared
-   String projectName = 'properties-test'
+   String projectName = 'tasks-help-test'
 
    @Shared
    FileTreeBuilder projectTree
@@ -57,15 +57,15 @@ class PropertiesTest extends Specification {
    }
 
    @Unroll
-   def "properties contains #property"() {
+   def "task help --task s3Upload contains #parameter"() {
 
       given:
-      executeSingleTask('properties', ['-Paws.region=us-west-1','-S'])
+      executeSingleTask('help', ['--task', 's3Upload', '-S'])
 
       expect:
-      result.output.contains("$property")
+      result.output.contains("--${parameter}")
 
       where:
-      property << ['aws.region','aws']
+      parameter << ['bucket-name','file-path','key-name']
    }
 }
