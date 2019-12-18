@@ -18,7 +18,7 @@ class S3Task extends DefaultTask {
    AmazonS3 getDefaultClient() {
       return AmazonS3ClientBuilder
               .standard()
-              .withRegion(project.aws.region)
+              .withRegion('us-east-1')
               .build()
    }
 
@@ -69,5 +69,9 @@ class S3Task extends DefaultTask {
    def writeObjectList(String bucket, File bucketList) {
       log.info "Bucket list: ${defaultClient.listObjects(bucket)}"
       bucketList.write(defaultClient.listObjects(bucket).toString())
+   }
+
+   def logRegion() {
+      log.warn "Region: ${project.extensions.aws.region}"
    }
 }
