@@ -1,8 +1,8 @@
 package com.redpillanalytics.aws.tasks
 
+import com.amazonaws.regions.Regions
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
-import com.amazonaws.services.s3.model.Region
 import com.amazonaws.services.s3.transfer.TransferManager
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder
 import groovy.util.logging.Slf4j
@@ -17,10 +17,7 @@ class S3Task extends DefaultTask {
 
    @Internal
    AmazonS3 getDefaultClient() {
-      return AmazonS3ClientBuilder
-              .standard()
-              .withRegion(Region.fromValue(project.aws.region))
-              .build()
+      return AmazonS3ClientBuilder.standard().withRegion(Regions.DEFAULT_REGION).build()
    }
 
    @Internal
