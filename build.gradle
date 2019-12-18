@@ -38,6 +38,14 @@ allprojects {
    project.version = scmVersion.version
 }
 
+task cleanJunit(type: Delete) {
+   delete getTestResultsDir()
+}
+
+task cleanLibs(type: Delete) {
+   delete getLibsDir()
+}
+
 testSets{
    integration
 }
