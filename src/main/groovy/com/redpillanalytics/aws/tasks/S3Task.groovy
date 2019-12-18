@@ -18,7 +18,8 @@ class S3Task extends DefaultTask {
    AmazonS3 getDefaultClient() {
       return AmazonS3ClientBuilder
               .standard()
-              .withRegion('us-east-1')
+              .withRegion(project.aws.region)
+              .withForceGlobalBucketAccessEnabled(true)
               .build()
    }
 
