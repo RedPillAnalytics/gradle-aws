@@ -8,7 +8,7 @@ plugins {
    id "com.github.ben-manes.versions" version "0.27.0"
    id 'com.adarshr.test-logger' version '2.0.0'
    id "com.redpillanalytics.gradle-analytics" version "1.2.3"
-   id "com.redpillanalytics.gradle-aws" version "0.1.5"
+   id "com.redpillanalytics.gradle-aws" version "0.1.6"
 }
 
 ext.pluginName = rootProject.name
@@ -19,7 +19,22 @@ analytics {
    sinks {
       pubsub
       s3 {
-         prefix = 'rpa-gradle-analytics' 
+         prefix = 'rpa-gradle-analytics'
+      }
+   }
+}
+
+aws {
+   s3 {
+      latest {
+         bucket = docsBucket
+         key =  "${pluginName}/latest/"
+         path = groovydoc.destinationDir.getPath()
+      }
+      release {
+         bucket = docsBucket
+         key = "${pluginName}/${version}/"
+         path = groovydoc.destinationDir.getPath()
       }
    }
 }
@@ -46,7 +61,7 @@ task cleanLibs(type: Delete) {
    delete getLibsDir()
 }
 
-testSets{
+testSets {
    integration
 }
 
@@ -123,37 +138,6 @@ tasks.withType(Test) {
 }
 
 tasks.githubRelease.mustRunAfter tasks.publishPlugins
-
-ext.bucket = 's3://documentation.redpillanalytics.com'
-ext.resourceBucket = 's3://rpa-build-resources'
-
-task publishVersionDocs {
-
-   description = 'Upload version Groovydocs to s3.'
-   group = 'documentation'
-
-   doLast {
-      exec {
-         executable 'aws'
-         args 's3', 'sync', groovydoc.destinationDir.getPath(), "${bucket}/${pluginName}/${version}/"
-      }
-   }
-   dependsOn groovydoc
-}
-
-task publishLatestDocs {
-
-   description = 'Upload latest Groovydocs to s3.'
-   group = 'documentation'
-
-   doLast {
-      exec {
-         executable 'aws'
-         args 's3', 'sync', groovydoc.destinationDir.getPath(), "${bucket}/${pluginName}/latest/"
-      }
-   }
-   dependsOn groovydoc
-}
 
 task publish {
    description 'Custom publish task.'

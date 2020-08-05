@@ -42,6 +42,7 @@ class S3UploadTest extends Specification {
             |   test {
             |     bucket = '${bucket}'
             |     key = 'build'
+            |     path = 'build'
             |   }
             |  }
             |}

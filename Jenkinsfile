@@ -37,7 +37,7 @@ pipeline {
          }
          post {
             always {
-               junit testResults: 'build/test-results/test/*.xml', allowEmptyResults: true
+               junit testResults: 'build/test-results/**/*.xml', allowEmptyResults: true
             }
          }
       }
@@ -45,7 +45,7 @@ pipeline {
       stage('Publish') {
          when { branch "master" }
          steps {
-            sh "$gradle publish -Pgradle.publish.key=${env.GRADLE_KEY} -Pgradle.publish.secret=${env.GRADLE_SECRET}"
+            sh "$gradle publish -Pgradle.publish.key=${env.GRADLE_KEY} -Pgradle.publish.secret=${env.GRADLE_SECRET} latestS3UploadSync versionS3UploadSync"
          }
          post {
             always {

@@ -63,13 +63,8 @@ class S3Task extends DefaultTask {
       return key
    }
 
-   @Internal
    def writeObjectList(String bucket, File bucketList) {
-      log.info "Bucket list: ${defaultClient.listObjects(bucket)}"
+      log.debug "Bucket list: ${defaultClient.listObjects(bucket)}"
       bucketList.write(defaultClient.listObjects(bucket).toString())
-   }
-
-   def logRegion() {
-      log.warn "Region: ${project.extensions.aws.region}"
    }
 }
